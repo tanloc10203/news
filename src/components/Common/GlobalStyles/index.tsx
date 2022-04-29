@@ -1,6 +1,8 @@
 import React from 'react';
-import '../../public/scss/reset.scss';
 import './GlobalStyles.scss';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 interface GlobalStylesProps {
   children: React.ReactNode;

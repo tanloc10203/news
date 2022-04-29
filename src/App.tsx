@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { GlobalStyles } from './components/Common';
 import { Home } from './components/Layouts';
+import { Login } from './features/auth/pages/Login';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
           <Route path="detail/:newsId" element={<h1>Chi tiết 1 bài viết có id</h1>} />
         </Route>
         <Route path="/category" element={<h1>Trang danh mục</h1>} />
-        <Route path="/login" element={<h1>Trang login</h1>} />
+        <Route path="/login" element={<Login />} />
         <Route path="/contact" element={<h1>Trang liên hệ</h1>} />
         <Route path="*" element={<h1>Không tìm thấy trang</h1>} />
       </Routes>

@@ -1,0 +1,32 @@
+.postOutstanding {
+  background: #fff;
+
+  a {
+    text-decoration: none;
+    color: black;
+
+    img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      transition: opacity 0.35s ease-in-out;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+
+  &Content {
+    padding: 16px;
+
+    h2 {
+      font-size: 25px;
+      transition: color 0.35s ease-in-out;
+
+      &:hover {
+        color: var(--color-red);
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+// .content1 {
+//   border: 1px solid red;
+// }
+
+// .content2 {
+//   border: 1px solid blue;
+// }
+
+.content-item {
+  background: #fff;
+  display: flex;
+  text-decoration: none;
+  color: #000;
+  transition: all 0.25s ease-in-out 0s;
+  justify-content: space-between;
+  box-shadow: #ddd 0 0 5px;
+
+  &:hover {
+    color: var(--color-red);
+  }
+
+  img {
+    // width: 100%;
+    flex-shrink: 0;
+    object-fit: cover;
+    transition: all 0.25s ease-in-out 0s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &--main {
+    font-size: 14px;
+    padding: 10px;
+
+    p {
+      font-weight: bold;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    span {
+      font-style: italic;
+    }
+  }
+}
