@@ -1,0 +1,34 @@
+.main-tabsSidebarRight {
+  ul li a {
+    text-transform: uppercase;
+    color: #000000;
+    cursor: pointer;
+    &.active {
+      font-weight: bold;
+    }
+  }
+
+  &--post {
+    display: flex;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+
+    div {
+      font-size: 13px;
+    }
+    a {
+      font-size: 14px;
+      color: #00739f;
+      margin-left: 20px;
+      text-decoration: none;
+    }
+  }
+
+  .tab-content {
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  }
+}

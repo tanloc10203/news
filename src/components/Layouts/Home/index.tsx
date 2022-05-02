@@ -5,6 +5,9 @@ import img1 from '../../../public/img/noiBat.jpg';
 import { PostOutstanding } from '../PostOutstanding';
 import item1 from '../../../public/img/item1.jpg';
 import { Link } from 'react-router-dom';
+import { CategoryPostHome } from '../CategoryPostHome';
+import { PostHomeLink } from '../PostHomeLink';
+import { TabsSidebarRight } from '../TabsSidebarRight';
 
 interface HomeProps {}
 
@@ -20,148 +23,29 @@ export function Home(props: HomeProps) {
       <PageMain>
         <div className="container mt-3">
           <div className="row">
-            <div className="col-lg-8 col-md-12 content1">
+            <div className="col-lg-9 col-md-12 content1">
               <PostOutstanding img={dataFirt.img} title={dataFirt.title} />
 
-              {/* Start Section */}
-              <section className="content-wp mt-3">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12 mb-3">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
+              {[1, 2, 3].map((i) => (
+                <section className="content-wp mt-3" key={i}>
+                  <div className="row">
+                    <div className="col-lg-6 col-md-12 mb-3">
+                      <PostHomeLink />
+                    </div>
+                    <div className="col-lg-6 col-md-12">
+                      <PostHomeLink />
+                    </div>
                   </div>
-                  <div className="col-lg-6 col-md-12">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </section>
+                </section>
+              ))}
 
-              <section className="content-wp mt-3">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12 mb-3">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </section>
-
-              <section className="content-wp mt-3">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12 mb-3">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </section>
-
-              <section className="content-wp mt-3">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12 mb-3">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </section>
-
-              <section className="content-wp mt-3">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12 mb-3">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất,
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <Link to="" className="content-item">
-                      <img src={item1} alt="" />
-                      <div className="content-item--main">
-                        <p>
-                          Mưa làm máy bay 'tắc' trên trời, Tân Sơn Nhất căng mình giảm ùn ứ mặt đất
-                        </p>
-                        <span className="text-muted">2 giờ trước</span>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </section>
-              {/* End Section */}
+              <CategoryPostHome titleCategory="Kinh tế" isContentRights />
+              <CategoryPostHome titleCategory="Văn hóa" isContentRights={false} />
+              <CategoryPostHome titleCategory="Tin thị trường" isContentRights />
             </div>
-            <div className="col-lg-4 col-md-12 content2">Nội dung 2</div>
+            <div className="col-lg-3 col-md-12 content2">
+              <TabsSidebarRight />
+            </div>
           </div>
         </div>
       </PageMain>

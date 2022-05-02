@@ -1,0 +1,20 @@
+.post {
+  font-size: 13px;
+  // border-right: 1px solid #ddd;
+  // border-left: 1px solid #ddd;
+  padding: 10px;
+  background-color: #fff;
+
+  &Content {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+
+    a {
+      margin-left: 15px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+  }
+}
