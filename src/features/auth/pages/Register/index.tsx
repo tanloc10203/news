@@ -2,16 +2,15 @@ import React from 'react';
 import { PageMain } from '../../../../components/Common';
 import { changeTitlePage } from '../../../../utils';
 
-type Props = {};
+interface RegisterProps {}
 
-export const Login = (props: Props) => {
+export const Register = (props: RegisterProps) => {
   React.useEffect(() => {
-    changeTitlePage('Đăng nhập');
+    changeTitlePage('Đăng ký');
   }, []);
-
   return (
     <PageMain>
-      <div style={{ height: '1000vh' }}>Login</div>
+      <div style={{ height: '1000vh' }}>Register</div>
     </PageMain>
   );
 };

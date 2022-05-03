@@ -4,3 +4,4 @@ export * from './GlobalStyles';
 export * from './PrivateRoute';
 export * from './ScrollToTop';
 export * from './BackToTop';
+export * from './CustomLink';

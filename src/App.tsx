@@ -3,7 +3,11 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { GlobalStyles } from './components/Common';
 import { Home } from './components/Layouts';
+import { Contact } from './components/Layouts/Contact';
+import { Introduce } from './components/Layouts/Introduce';
 import { Login } from './features/auth/pages/Login';
+import { Register } from './features/auth/pages/Register';
+import { PostCreate } from './features/post/page/PostCreate';
 
 function App() {
   return (
@@ -17,7 +21,10 @@ function App() {
         </Route>
         <Route path="/category" element={<h1>Trang danh mục</h1>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/contact" element={<h1>Trang liên hệ</h1>} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/introduce" element={<Introduce />} />
+        <Route path="/create-post" element={<PostCreate />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<h1>Không tìm thấy trang</h1>} />
       </Routes>
     </GlobalStyles>

@@ -2,9 +2,10 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import React from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem } from 'reactstrap';
 import { useWindowScroll } from '../../../hooks';
+import { CustomLink } from '../CustomLink';
 import styles from './Header.module.scss';
 
 interface HeaderProps {}
@@ -32,21 +33,25 @@ export function Header(props: HeaderProps) {
                 <Collapse isOpen={isOpen} navbar className={styles.headerNav}>
                   <Nav className="ml-auto" navbar>
                     <NavItem>
-                      <NavLink to="/" className={styles.active}>
-                        Trang chủ
-                      </NavLink>
+                      <CustomLink to="/">Trang chủ</CustomLink>
                     </NavItem>
                     <NavItem>
-                      <NavLink to="/contact">Giới thiệu</NavLink>
+                      <CustomLink to="/introduce">Giới thiệu</CustomLink>
                     </NavItem>
                     <NavItem>
-                      <NavLink to="#">Liên hệ</NavLink>
+                      <CustomLink to="/contact">Liên hệ</CustomLink>
                     </NavItem>
                     <NavItem>
-                      <NavLink to="#">Viết bài</NavLink>
+                      <CustomLink to="/create-post">Viết bài</CustomLink>
+                    </NavItem>
+                    {/* <NavItem>
+                      <CustomLink to="/login">Đăng xuất</CustomLink>
+                    </NavItem> */}
+                    <NavItem>
+                      <CustomLink to="/login">Đăng nhập</CustomLink>
                     </NavItem>
                     <NavItem>
-                      <NavLink to="/login">Đăng xuất</NavLink>
+                      <CustomLink to="/register">Đăng ký</CustomLink>
                     </NavItem>
                   </Nav>
                   <div className={styles.headerSearch}>

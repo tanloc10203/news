@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { CategoryPostHome } from '../CategoryPostHome';
 import { PostHomeLink } from '../PostHomeLink';
 import { TabsSidebarRight } from '../TabsSidebarRight';
+import { changeTitlePage } from '../../../utils';
 
 interface HomeProps {}
 
@@ -17,6 +18,10 @@ export function Home(props: HomeProps) {
     content: 'sdfsdfsdfs sdfs',
     title: 'Đề nghị dừng lưu hành MV có nội dung tiêu cực của Sơn Tùng - MTP',
   };
+
+  React.useEffect(() => {
+    changeTitlePage('Trang chủ');
+  }, []);
 
   return (
     <>
