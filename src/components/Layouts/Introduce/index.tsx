@@ -9,5 +9,11 @@ export function Introduce(props: IntroduceProps) {
     changeTitlePage('Giới thiệu');
   }, []);
 
-  return <PageMain>Trang giới thiệu</PageMain>;
+  return (
+    <PageMain>
+      <div>
+        <h1 className="text-center">Trang giới thiệu</h1>
+      </div>
+    </PageMain>
+  );
 }

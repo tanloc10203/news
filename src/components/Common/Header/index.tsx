@@ -1,9 +1,12 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
+import { getAuth, signOut } from 'firebase/auth';
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem } from 'reactstrap';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { clearUserLogin, selectAuth } from '../../../features/auth/authSlice';
 import { useWindowScroll } from '../../../hooks';
 import { CustomLink } from '../CustomLink';
 import styles from './Header.module.scss';
@@ -13,6 +16,10 @@ interface HeaderProps {}
 export function Header(props: HeaderProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const heightWindow = useWindowScroll();
+  const auth = getAuth();
+  const authState = useAppSelector(selectAuth);
+  const { userLogin } = authState;
+  const dispatch = useAppDispatch();
 
   return (
     <div
@@ -44,16 +51,26 @@ export function Header(props: HeaderProps) {
                     <NavItem>
                       <CustomLink to="/create-post">Viết bài</CustomLink>
                     </NavItem>
-                    {/* <NavItem>
-                      <CustomLink to="/login">Đăng xuất</CustomLink>
-                    </NavItem> */}
-                    <NavItem>
-                      <CustomLink to="/login">Đăng nhập</CustomLink>
-                    </NavItem>
-                    <NavItem>
-                      <CustomLink to="/register">Đăng ký</CustomLink>
-                    </NavItem>
+
+                    {Object.keys(userLogin).length > 0 ? (
+                      <NavItem>
+                        <CustomLink
+                          to="/logout"
+                          onClick={() => {
+                            signOut(auth);
+                            dispatch(clearUserLogin());
+                          }}
+                        >
+                          Đăng xuất
+                        </CustomLink>
+                      </NavItem>
+                    ) : (
+                      <NavItem>
+                        <CustomLink to="/login">Đăng nhập</CustomLink>
+                      </NavItem>
+                    )}
                   </Nav>
+
                   <div className={styles.headerSearch}>
                     <input className="form-control me-2" type="search" placeholder="Tìm kiếm" />
                     <button className="btn btn-outline-light" type="submit">
