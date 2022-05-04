@@ -5,14 +5,11 @@ import { GlobalStyles, PrivateRoute } from './components/Common';
 import { Home } from './components/Layouts';
 import { Contact } from './components/Layouts/Contact';
 import { Introduce } from './components/Layouts/Introduce';
+import './config/firebase';
 import { Login } from './features/auth/pages/Login';
+import { Logout } from './features/auth/pages/Logout';
 import { Register } from './features/auth/pages/Register';
 import { PostCreate } from './features/post/page/PostCreate';
-import { initializeApp } from 'firebase/app';
-import { config } from './config';
-import { Logout } from './features/auth/pages/Logout';
-
-initializeApp(config.firebaseConfig);
 
 function App() {
   return (

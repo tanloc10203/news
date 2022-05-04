@@ -1,13 +1,19 @@
-import { RootState } from './../../app/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { userLoginM } from '../../models';
+import { RootState } from './../../app/store';
 
 export interface AuthState {
-  userLogin: object;
+  userLogin: userLoginM;
   status: 'idle' | 'loading' | 'failed';
 }
 
 const initialState: AuthState = {
-  userLogin: {},
+  userLogin: {
+    displayName: '',
+    photoURL: '',
+    token: '',
+    uid: '',
+  },
   status: 'idle',
 };
 
@@ -20,7 +26,7 @@ export const authSlice = createSlice({
     },
     setUserLogin: (state, action: PayloadAction<object>) => {
       state.status = 'idle';
-      state.userLogin = action.payload;
+      state.userLogin = { ...state.userLogin, ...action.payload };
     },
     clearUserLogin: () => {
       return initialState;

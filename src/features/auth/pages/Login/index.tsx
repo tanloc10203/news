@@ -2,10 +2,10 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
+import { useAppSelector } from '../../../../app/hooks';
 import { PageMain } from '../../../../components/Common';
 import { changeTitlePage } from '../../../../utils';
-import { selectAuth, userLogin } from '../../authSlice';
+import { selectAuth } from '../../authSlice';
 
 type Props = {};
 
@@ -13,7 +13,6 @@ export const Login = (props: Props) => {
   const auth = getAuth();
   const navigate = useNavigate();
   const [authing, setAuthing] = useState(false);
-  const dispatch = useAppDispatch();
   const authState = useAppSelector(selectAuth);
   const { status } = authState;
 
@@ -25,19 +24,13 @@ export const Login = (props: Props) => {
     setAuthing(true);
     signInWithPopup(auth, new GoogleAuthProvider())
       .then(async (response) => {
-        console.log('check response', response.user);
-        const { displayName, photoURL, refreshToken, uid } = response.user;
-        const data = {
-          displayName,
-          photoURL,
-          refreshToken,
-          uid,
-        };
+        // const credential = GoogleAuthProvider.credentialFromResult(response);
+        // const token = credential && credential.accessToken;
+        const user = response.user;
 
-        const responses = await dispatch(userLogin(data));
-        console.log(responses);
+        localStorage.setItem('auth_user', JSON.stringify(user));
 
-        if (responses.payload) navigate('/create-post');
+        user && navigate('/create-post');
       })
       .catch((error) => {
         console.log(error);
@@ -47,21 +40,21 @@ export const Login = (props: Props) => {
 
   return (
     <PageMain>
-      <div className="main-login">
+      <div className="main-login" style={{ height: '336px' }}>
         <div className="container">
           <div className="row">
-            <div className="col-md-12">
-              <h1 className="text-center">Đăng nhập</h1>
+            <div className="col-md-12 text-center p-3">
+              <h5 className="">Đăng nhập với Google</h5>
               <div className="form-login">
                 {status === 'loading' ? (
                   <Spinner>...Loading...</Spinner>
                 ) : (
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-outline-primary"
                     onClick={handleSigninWithGoogle}
                     disabled={authing}
                   >
-                    Đăng nhập với Google
+                    Google
                   </button>
                 )}
               </div>

@@ -5,8 +5,6 @@ import { getAuth, signOut } from 'firebase/auth';
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { clearUserLogin, selectAuth } from '../../../features/auth/authSlice';
 import { useWindowScroll } from '../../../hooks';
 import { CustomLink } from '../CustomLink';
 import styles from './Header.module.scss';
@@ -15,11 +13,16 @@ interface HeaderProps {}
 
 export function Header(props: HeaderProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [img, setImg] = React.useState('');
   const heightWindow = useWindowScroll();
   const auth = getAuth();
-  const authState = useAppSelector(selectAuth);
-  const { userLogin } = authState;
-  const dispatch = useAppDispatch();
+  const authUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+
+  React.useEffect(() => {
+    if (authUser && authUser.photoURL) {
+      setImg(authUser.photoURL);
+    }
+  }, [authUser]);
 
   return (
     <div
@@ -52,13 +55,13 @@ export function Header(props: HeaderProps) {
                       <CustomLink to="/create-post">Viết bài</CustomLink>
                     </NavItem>
 
-                    {Object.keys(userLogin).length > 0 ? (
+                    {localStorage.getItem('auth_user') ? (
                       <NavItem>
                         <CustomLink
                           to="/logout"
                           onClick={() => {
                             signOut(auth);
-                            dispatch(clearUserLogin());
+                            localStorage.removeItem('auth_user');
                           }}
                         >
                           Đăng xuất
@@ -76,14 +79,13 @@ export function Header(props: HeaderProps) {
                     <button className="btn btn-outline-light" type="submit">
                       <FontAwesomeIcon icon={faMagnifyingGlass} />
                     </button>
-                    <div className={styles.headerImg}>
-                      <Link to="">
-                        <img
-                          src="https://kiemtientuweb.com/ckfinder/userfiles/images/avatar-cute/avatar-cute-12.jpg"
-                          alt=""
-                        />
-                      </Link>
-                    </div>
+                    {localStorage.getItem('auth_user') && (
+                      <div className={styles.headerImg}>
+                        {/* <Link to=""> */}
+                        <img src={img} alt="" />
+                        {/* </Link> */}
+                      </div>
+                    )}
                   </div>
                 </Collapse>
               </Navbar>
