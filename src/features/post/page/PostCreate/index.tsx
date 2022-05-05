@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { PageMain } from '../../../../components/Common';
-import { changeTitlePage } from '../../../../utils';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../../../config';
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { Spinner } from 'reactstrap';
+import { PageMain } from '../../../../components/Common';
+import { db, storage } from '../../../../config';
+import { changeTitlePage } from '../../../../utils';
+import { ref, uploadBytes, getDownloadURL, listAll, list } from 'firebase/storage';
 
 interface PostCreateProps {}
 
@@ -11,6 +12,7 @@ interface usersFB {
   age: number;
   id: string;
   name: string;
+  imgUrl?: string;
 }
 
 export function PostCreate(props: PostCreateProps) {
@@ -19,6 +21,28 @@ export function PostCreate(props: PostCreateProps) {
   const [loading, setLoading] = useState(false);
   const [newName, setNewName] = useState('');
   const [newAge, setNewAge] = useState(0);
+  const [imgUpload, setImgUpload] = useState<File | null>(null);
+  const [status, setStatus] = useState(false);
+  // const [imgUrl, setImgUrl] = useState('');
+
+  const handleImgUpload = (): Promise<string | undefined> => {
+    return new Promise((resolve, reject) => {
+      try {
+        console.log('running handleImgUpload...');
+        console.log(imgUpload);
+        if (imgUpload == null) return;
+        const imageRef = ref(storage, `images/${imgUpload.name + imgUpload.lastModified}`);
+        uploadBytes(imageRef, imgUpload).then((snapshot) => {
+          getDownloadURL(snapshot.ref).then((url) => {
+            console.log('url success', url);
+            resolve(url);
+          });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
 
   useEffect(() => {
     getUsers();
@@ -29,7 +53,7 @@ export function PostCreate(props: PostCreateProps) {
     let newData =
       data &&
       data.docs.map((doc): usersFB => {
-        return { name: doc.data().name, age: doc.data().age, id: doc.id } as usersFB;
+        return { ...doc.data(), id: doc.id } as usersFB;
       });
     setUsers(newData);
   };
@@ -46,11 +70,25 @@ export function PostCreate(props: PostCreateProps) {
     changeTitlePage('Viêt bài');
   }, []);
 
-  console.log(users);
-
   const createUser = async () => {
-    await addDoc(usersCollectionRef, { name: newName, age: Number(newAge) });
-    setLoading(true);
+    setStatus(true);
+    const imgUrl = await handleImgUpload();
+
+    if (imgUrl !== undefined) {
+      console.log('running create user...');
+      addDoc(usersCollectionRef, { name: newName, age: Number(newAge), imgUrl: imgUrl })
+        .then((response) => {
+          if (response) {
+            console.log('response success', response);
+            setStatus(false);
+            setNewName('');
+            setNewAge(0);
+            setImgUpload(null);
+            setLoading(true);
+          }
+        })
+        .catch((error) => console.log(error));
+    }
   };
 
   const updateUser = async (id: string, age: number) => {
@@ -66,7 +104,7 @@ export function PostCreate(props: PostCreateProps) {
     setLoading(true);
   };
 
-  if (users.length === 0)
+  if (users.length < 0)
     return (
       <PageMain>
         <div className="container">
@@ -88,20 +126,28 @@ export function PostCreate(props: PostCreateProps) {
               <input
                 placeholder="Name..."
                 className="form-control mb-2"
-                onChange={(event) => {
-                  setNewName(event.target.value);
+                onChange={(event: FormEvent<HTMLInputElement>) => {
+                  setNewName(event.currentTarget.value);
                 }}
               />
               <input
                 type="number"
                 placeholder="Age..."
                 className="form-control mb-2"
-                onChange={(event) => {
-                  setNewAge(+event.target.value);
+                onChange={(event: FormEvent<HTMLInputElement>) => {
+                  setNewAge(+event.currentTarget.value);
                 }}
               />
-              <button onClick={createUser} className="btn btn-primary">
-                Create User
+
+              <input
+                type="file"
+                className="form-control mb-2"
+                onChange={(event: FormEvent<HTMLInputElement>) => {
+                  setImgUpload(event.currentTarget.files && event.currentTarget.files[0]);
+                }}
+              />
+              <button onClick={createUser} className="btn btn-primary" disabled={status}>
+                {status ? <Spinner>Loading...</Spinner> : 'Create User'}
               </button>
             </div>
             <div className="render-users">
@@ -111,13 +157,24 @@ export function PostCreate(props: PostCreateProps) {
                     <div key={index}>
                       <h1>Name: {user.name}</h1>
                       <h1>Age: {user.age}</h1>
+                      <div className="mb-2">
+                        <img
+                          src={user.imgUrl}
+                          alt=""
+                          style={{
+                            maxWidth: '100%',
+                            width: '500px',
+                            height: '100px',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={() => {
                           updateUser(user.id, user.age);
                         }}
                         className="btn btn-success"
                       >
-                        {' '}
                         Increase Age
                       </button>
                       <button
