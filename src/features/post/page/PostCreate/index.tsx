@@ -1,10 +1,11 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { FormEvent, useEffect, useState } from 'react';
+import { useQuill } from 'react-quilljs';
 import { Spinner } from 'reactstrap';
 import { PageMain } from '../../../../components/Common';
 import { db, storage } from '../../../../config';
-import { changeTitlePage } from '../../../../utils';
-import { ref, uploadBytes, getDownloadURL, listAll, list } from 'firebase/storage';
+import { changeTitlePage, formats, modules } from '../../../../utils';
 
 interface PostCreateProps {}
 
@@ -13,6 +14,7 @@ interface usersFB {
   id: string;
   name: string;
   imgUrl?: string;
+  content?: string;
 }
 
 export function PostCreate(props: PostCreateProps) {
@@ -23,7 +25,17 @@ export function PostCreate(props: PostCreateProps) {
   const [newAge, setNewAge] = useState(0);
   const [imgUpload, setImgUpload] = useState<File | null>(null);
   const [status, setStatus] = useState(false);
-  // const [imgUrl, setImgUrl] = useState('');
+  const [loadingGetUser, setLoadingGetUser] = useState(false);
+  const [text, setText] = useState('');
+  const { quill, quillRef } = useQuill({ modules, formats, theme: 'snow' });
+
+  React.useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        setText(quillRef.current.firstChild.innerHTML);
+      });
+    }
+  }, [quill, quillRef]);
 
   const handleImgUpload = (): Promise<string | undefined> => {
     return new Promise((resolve, reject) => {
@@ -49,7 +61,9 @@ export function PostCreate(props: PostCreateProps) {
   }, []);
 
   const getUsers = async () => {
+    setLoadingGetUser(true);
     const data = await getDocs(usersCollectionRef);
+    data && setLoadingGetUser(false);
     let newData =
       data &&
       data.docs.map((doc): usersFB => {
@@ -76,7 +90,12 @@ export function PostCreate(props: PostCreateProps) {
 
     if (imgUrl !== undefined) {
       console.log('running create user...');
-      addDoc(usersCollectionRef, { name: newName, age: Number(newAge), imgUrl: imgUrl })
+      addDoc(usersCollectionRef, {
+        name: newName,
+        age: Number(newAge),
+        imgUrl: imgUrl,
+        content: text,
+      })
         .then((response) => {
           if (response) {
             console.log('response success', response);
@@ -104,19 +123,6 @@ export function PostCreate(props: PostCreateProps) {
     setLoading(true);
   };
 
-  if (users.length < 0)
-    return (
-      <PageMain>
-        <div className="container">
-          <div className="row">
-            <div className="col-md-12 text-center">
-              <Spinner>Loading...</Spinner>
-            </div>
-          </div>
-        </div>
-      </PageMain>
-    );
-
   return (
     <PageMain>
       <div className="container">
@@ -126,6 +132,7 @@ export function PostCreate(props: PostCreateProps) {
               <input
                 placeholder="Name..."
                 className="form-control mb-2"
+                value={newName}
                 onChange={(event: FormEvent<HTMLInputElement>) => {
                   setNewName(event.currentTarget.value);
                 }}
@@ -134,6 +141,7 @@ export function PostCreate(props: PostCreateProps) {
                 type="number"
                 placeholder="Age..."
                 className="form-control mb-2"
+                value={newAge}
                 onChange={(event: FormEvent<HTMLInputElement>) => {
                   setNewAge(+event.currentTarget.value);
                 }}
@@ -146,12 +154,25 @@ export function PostCreate(props: PostCreateProps) {
                   setImgUpload(event.currentTarget.files && event.currentTarget.files[0]);
                 }}
               />
+
+              <div className="mb-2 react-quill">
+                <div ref={quillRef} />
+              </div>
+
               <button onClick={createUser} className="btn btn-primary" disabled={status}>
                 {status ? <Spinner>Loading...</Spinner> : 'Create User'}
               </button>
             </div>
             <div className="render-users">
-              {users &&
+              {loadingGetUser ? (
+                <div className="container">
+                  <div className="row">
+                    <div className="col-md-12 text-center">
+                      <Spinner>Loading...</Spinner>
+                    </div>
+                  </div>
+                </div>
+              ) : users.length > 0 ? (
                 users.map((user, index: number) => {
                   return (
                     <div key={index}>
@@ -169,6 +190,12 @@ export function PostCreate(props: PostCreateProps) {
                           }}
                         />
                       </div>
+                      {user.content && (
+                        <div
+                          className="post__description"
+                          dangerouslySetInnerHTML={{ __html: user.content }}
+                        />
+                      )}
                       <button
                         onClick={() => {
                           updateUser(user.id, user.age);
@@ -188,7 +215,10 @@ export function PostCreate(props: PostCreateProps) {
                       </button>
                     </div>
                   );
-                })}
+                })
+              ) : (
+                <p>Không có user nào</p>
+              )}
             </div>
           </div>
         </div>
