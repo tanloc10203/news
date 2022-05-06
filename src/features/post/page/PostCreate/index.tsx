@@ -1,3 +1,5 @@
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { FormEvent, useEffect, useState } from 'react';
@@ -5,7 +7,8 @@ import { useQuill } from 'react-quilljs';
 import { Spinner } from 'reactstrap';
 import { PageMain } from '../../../../components/Common';
 import { db, storage } from '../../../../config';
-import { changeTitlePage, formats, modules } from '../../../../utils';
+import { changeTitlePage, formats, getBase64, modules } from '../../../../utils';
+// import './PostCreate.scss';
 
 interface PostCreateProps {}
 
@@ -20,14 +23,15 @@ interface usersFB {
 export function PostCreate(props: PostCreateProps) {
   const usersCollectionRef = collection(db, 'users');
   const [users, setUsers] = useState(Array<usersFB>());
-  const [loading, setLoading] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newAge, setNewAge] = useState(0);
-  const [imgUpload, setImgUpload] = useState<File | null>(null);
-  const [status, setStatus] = useState(false);
-  const [loadingGetUser, setLoadingGetUser] = useState(false);
-  const [text, setText] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [newName, setNewName] = useState<string>('');
+  const [newAge, setNewAge] = useState<number>(0);
+  const [imgUpload, setImgUpload] = useState<File | undefined>();
+  const [status, setStatus] = useState<boolean>(false);
+  const [loadingGetUser, setLoadingGetUser] = useState<boolean>(false);
+  const [text, setText] = useState<string>('');
   const { quill, quillRef } = useQuill({ modules, formats, theme: 'snow' });
+  const [imgBase64, setImgBase64] = useState<string>('');
 
   React.useEffect(() => {
     if (quill) {
@@ -102,7 +106,7 @@ export function PostCreate(props: PostCreateProps) {
             setStatus(false);
             setNewName('');
             setNewAge(0);
-            setImgUpload(null);
+            setImgUpload(undefined);
             setLoading(true);
           }
         })
@@ -121,6 +125,15 @@ export function PostCreate(props: PostCreateProps) {
     const userDoc = doc(db, 'users', id);
     await deleteDoc(userDoc);
     setLoading(true);
+  };
+
+  const handleChangeImgGetBase64 = (event: FormEvent<HTMLInputElement>) => {
+    if (event.currentTarget.files) {
+      setImgUpload(event.currentTarget.files[0]);
+      getBase64(event.currentTarget.files[0], (_result: string) => {
+        setImgBase64(_result);
+      });
+    }
   };
 
   return (
@@ -147,12 +160,25 @@ export function PostCreate(props: PostCreateProps) {
                 }}
               />
 
+              {imgBase64 ? (
+                <div className="show-img-base64">
+                  <img src={imgBase64} alt="" />
+                </div>
+              ) : (
+                <label className="img-show" htmlFor="img">
+                  <div>
+                    <FontAwesomeIcon icon={faUpload} />
+                  </div>
+                </label>
+              )}
+
               <input
+                id="img"
                 type="file"
+                // hidden
                 className="form-control mb-2"
-                onChange={(event: FormEvent<HTMLInputElement>) => {
-                  setImgUpload(event.currentTarget.files && event.currentTarget.files[0]);
-                }}
+                // value={imgUpload}
+                onChange={handleChangeImgGetBase64}
               />
 
               <div className="mb-2 react-quill">

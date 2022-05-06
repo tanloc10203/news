@@ -1,0 +1,34 @@
+.img-show {
+  width: 100%;
+  height: 200px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease-in-out 0s;
+  margin-bottom: 16px;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  div {
+    svg {
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+}
+
+.show-img-base64 img {
+  width: 100%;
+  width: 600px;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+  margin-bottom: 16px;
+  border-radius: 0.5em;
+}

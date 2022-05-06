@@ -9,7 +9,7 @@ import './config/firebase';
 import { Login } from './features/auth/pages/Login';
 import { Logout } from './features/auth/pages/Logout';
 import { Register } from './features/auth/pages/Register';
-import { PostCreate } from './features/post/page/PostCreate';
+import { CreatePost } from './features/post/page/CreatePost';
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
           path="/create-post"
           element={
             <PrivateRoute>
-              <PostCreate />
+              <CreatePost />
             </PrivateRoute>
           }
         />
