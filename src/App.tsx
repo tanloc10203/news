@@ -10,6 +10,8 @@ import { Login } from './features/auth/pages/Login';
 import { Logout } from './features/auth/pages/Logout';
 import { Register } from './features/auth/pages/Register';
 import { CreatePost } from './features/post/page/CreatePost';
+import { Detail } from './features/post/page/Detail';
+import { UpdatePost } from './features/post/page/UpdatePost';
 
 function App() {
   return (
@@ -17,9 +19,19 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/news">
+          <Route
+            path="update-post"
+            element={
+              <PrivateRoute>
+                <UpdatePost />
+              </PrivateRoute>
+            }
+          />
           <Route index element={<h1>News</h1>} />
-          <Route path="detail" element={<h1>Chi tiết</h1>} />
-          <Route path="detail/:newsId" element={<h1>Chi tiết 1 bài viết có id</h1>} />
+          <Route path=":categoryId">
+            <Route index element={<h1>Trang con</h1>} />
+            <Route path=":newsId" element={<Detail />} />
+          </Route>
         </Route>
         <Route path="/category" element={<h1>Trang danh mục</h1>} />
         <Route path="/login" element={<Login />} />

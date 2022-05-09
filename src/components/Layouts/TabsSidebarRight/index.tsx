@@ -1,12 +1,16 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Post } from '../../../models';
 import { PostTabsSidebarRight } from '../PostTabsSidebarRight';
 import './TabsSidebarRight.scss';
 
-interface TabsSidebarRightProps {}
+interface TabsSidebarRightProps {
+  post: Array<Post>;
+}
 
 export const TabsSidebarRight = (props: TabsSidebarRightProps) => {
+  const { post } = props;
   const [activeTab, setActiveTab] = useState('1');
 
   const toggle = (tab: string) => {
@@ -42,20 +46,26 @@ export const TabsSidebarRight = (props: TabsSidebarRightProps) => {
       <TabContent activeTab={activeTab}>
         <TabPane tabId="1">
           <Row>
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Col lg="12" key={i}>
-                <PostTabsSidebarRight />
-              </Col>
-            ))}
+            {post && post.length > 0
+              ? post.map((item, i) => (
+                  <Col lg="12" className="p-0" key={i}>
+                    <PostTabsSidebarRight data={item} />
+                  </Col>
+                ))
+              : [1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="content-tabs--loading"></div>
+                ))}
           </Row>
         </TabPane>
         <TabPane tabId="2">
           <Row>
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Col lg="12" key={i}>
-                <PostTabsSidebarRight />
-              </Col>
-            ))}
+            {post &&
+              post.length > 0 &&
+              post.map((item, i) => (
+                <Col lg="12" className="p-0" key={i}>
+                  <PostTabsSidebarRight data={item} />
+                </Col>
+              ))}
           </Row>
         </TabPane>
       </TabContent>

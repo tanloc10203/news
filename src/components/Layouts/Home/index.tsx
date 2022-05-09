@@ -1,22 +1,62 @@
-import React from 'react';
+import { collection, getDocs, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../config';
+import { Post } from '../../../models';
+import { changeTitlePage, parseMillisecondsIntoReadableTime } from '../../../utils';
 import { PageMain } from '../../Common';
-import './Home.scss';
-import img1 from '../../../public/img/noiBat.jpg';
-import { PostOutstanding } from '../PostOutstanding';
-import item1 from '../../../public/img/item1.jpg';
-import { Link } from 'react-router-dom';
 import { CategoryPostHome } from '../CategoryPostHome';
 import { PostHomeLink } from '../PostHomeLink';
+import { PostOutstanding } from '../PostOutstanding';
 import { TabsSidebarRight } from '../TabsSidebarRight';
-import { changeTitlePage } from '../../../utils';
+import './Home.scss';
 
 interface HomeProps {}
 
 export function Home(props: HomeProps) {
-  const dataFirt = {
-    img: img1,
-    content: 'sdfsdfsdfs sdfs',
-    title: 'Đề nghị dừng lưu hành MV có nội dung tiêu cực của Sơn Tùng - MTP',
+  const postCollectionRef = collection(db, 'post');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [post, setPost] = useState(Array<Post>());
+  const [categoryName, setCategoryName] = useState<string>('');
+
+  useEffect(() => {
+    const getCategoryDetail = async () => {
+      if (post && post.length > 0) {
+        const q = query(collection(db, 'category'), where('link', '==', post[0].categoryId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          setCategoryName(doc.data().name);
+        });
+      }
+    };
+    getCategoryDetail();
+  }, [post]);
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  const getPosts = async () => {
+    setLoading(true);
+    const data = await getDocs(postCollectionRef);
+    const q = query(postCollectionRef, orderBy('createdAt', 'desc'));
+    if (data) {
+      setLoading(false);
+      onSnapshot(q, (snapshot) =>
+        setPost(
+          snapshot.docs.map((doc): Post => {
+            const createdAt = doc.data().createdAt.toDate();
+            const d = new Date(createdAt);
+            const now = new Date();
+            const dd = now.getTime() - d.getTime();
+            return {
+              ...doc.data(),
+              id: doc.id,
+              time: parseMillisecondsIntoReadableTime(dd),
+            } as Post;
+          })
+        )
+      );
+    }
   };
 
   React.useEffect(() => {
@@ -29,7 +69,18 @@ export function Home(props: HomeProps) {
         <div className="container mt-3">
           <div className="row">
             <div className="col-lg-9 col-md-12 content1">
-              <PostOutstanding img={dataFirt.img} title={dataFirt.title} />
+              {!loading ? (
+                post &&
+                post.length > 0 && <PostOutstanding categoryName={categoryName} data={post[0]} />
+              ) : (
+                <div className="loading-data">
+                  <div></div>
+                  <div className="loading-data--content">
+                    <div></div>
+                    <span></span>
+                  </div>
+                </div>
+              )}
 
               {[1, 2, 3].map((i) => (
                 <section className="content-wp mt-3" key={i}>
@@ -49,7 +100,7 @@ export function Home(props: HomeProps) {
               <CategoryPostHome titleCategory="Tin thị trường" isContentRights />
             </div>
             <div className="col-lg-3 col-md-12 content2">
-              <TabsSidebarRight />
+              <TabsSidebarRight post={post && post} />
             </div>
           </div>
         </div>

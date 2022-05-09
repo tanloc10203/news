@@ -40,3 +40,37 @@ body {
   margin-top: 0.5em;
   font-size: small;
 }
+
+.form-custom {
+  background: #f5f5f5 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #000 !important;
+
+  &:focus {
+    color: #212529;
+    background-color: transparent !important;
+    border-color: #212529 !important;
+    outline: 0;
+    box-shadow: none !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

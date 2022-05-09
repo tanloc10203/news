@@ -13,11 +13,15 @@
     padding-bottom: 12px;
     margin-bottom: 15px;
     border-bottom: 1px solid #eee;
+    width: 100%;
+    justify-content: space-between;
 
     div {
       font-size: 13px;
+      width: 14%;
     }
     a {
+      width: calc(100% - 14%);
       font-size: 14px;
       color: #00739f;
       margin-left: 20px;
@@ -31,4 +35,11 @@
     background: #fff;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   }
+}
+
+.content-tabs--loading {
+  width: 100%;
+  height: 40px;
+  background: #ddd;
+  margin-bottom: 5px;
 }

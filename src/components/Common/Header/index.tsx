@@ -2,27 +2,52 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { getAuth, signOut } from 'firebase/auth';
-import React from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem } from 'reactstrap';
+import { db } from '../../../config';
 import { useWindowScroll } from '../../../hooks';
+import { cutNameUrl } from '../../../utils/format';
 import { CustomLink } from '../CustomLink';
 import styles from './Header.module.scss';
 
 interface HeaderProps {}
 
+export interface Category {
+  id: string;
+  name: string;
+  link: string;
+}
+
 export function Header(props: HeaderProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [img, setImg] = React.useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [img, setImg] = useState('');
   const heightWindow = useWindowScroll();
   const auth = getAuth();
   const authUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+  const categoryCollectionRef = collection(db, 'category');
+  const [category, setCategory] = useState(Array<Category>());
+  const location = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authUser && authUser.photoURL) {
       setImg(authUser.photoURL);
     }
   }, [authUser]);
+
+  useEffect(() => {
+    const getCategory = async () => {
+      const data = await getDocs(categoryCollectionRef);
+      if (data) {
+        const newDate = data.docs.map((docs) => {
+          return { ...docs.data(), id: docs.id } as Category;
+        });
+        setCategory(newDate);
+      }
+    };
+    getCategory();
+  }, [categoryCollectionRef]);
 
   return (
     <div
@@ -100,15 +125,32 @@ export function Header(props: HeaderProps) {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <Link to="" className={styles.active}>
-                Kinh tế
-              </Link>
-              <Link to="">Văn hóa</Link>
-              <Link to="">Chính trị</Link>
-              <Link to="">Xã hội</Link>
-              <Link to="">Giải trí</Link>
-              <Link to="">Môi trường</Link>
-              <Link to="">Thể thao</Link>
+              {category && category.length ? (
+                category.map((item, i) => (
+                  <Link
+                    key={i}
+                    to={`/news/${item.link}-${item.id}`}
+                    style={{
+                      color:
+                        location &&
+                        location.pathname &&
+                        cutNameUrl(location.pathname, 6) === item.link
+                          ? 'black'
+                          : '',
+                    }}
+                  >
+                    {item.name}
+                  </Link>
+                ))
+              ) : (
+                <div className={styles.loading}>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+              )}
             </div>
           </div>
         </div>

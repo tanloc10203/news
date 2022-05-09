@@ -1,9 +1,11 @@
 export interface Post {
+  id: string;
   title: string;
   contenHtml: string;
   imgTitle: string;
   imgTitlePost: string;
-  category_id?: string;
-  created_at?: string;
-  updated_at?: string;
+  categoryId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  time?: string;
 }

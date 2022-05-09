@@ -1,31 +1,20 @@
 import clsx from 'clsx';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useQuill } from 'react-quilljs';
-import { useNavigate } from 'react-router-dom';
-import { Spinner } from 'reactstrap';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Category, PageMain } from '../../../../components/Common';
-import { createdAt, db, storage } from '../../../../config';
+import { db, storage } from '../../../../config';
+import styles from './UpdatePost.module.scss';
 import { formats, modules } from '../../../../utils';
-import styles from './CreatePost.module.scss';
+import { showErr, States } from '../CreatePost';
+import { Spinner } from 'reactstrap';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { Post } from '../../../../models';
 
-interface CreatePostProps {}
+interface UpdatePostProps {}
 
-export interface States {
-  title: string;
-  imgTitle: string;
-  imgTitlePost: string;
-}
-
-export interface showErr {
-  titleErr: string;
-  imgTitleErr: string;
-  imgTitlePostErr: string;
-  contenetHtmlErr: string;
-}
-
-export const CreatePost: React.FC = (props: CreatePostProps) => {
+export const UpdatePost = (props: UpdatePostProps) => {
   const usersCollectionRef = collection(db, 'post');
   const categoryCollectionRef = collection(db, 'category');
   const navigate = useNavigate();
@@ -35,8 +24,18 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     theme: 'snow',
   });
 
-  const [state, setState] = useState<States>({
-    title: '',
+  const { state } = useLocation();
+  const postDetail: Post | any = state;
+  console.log(state);
+
+  useEffect(() => {
+    if (quill) {
+      quill.clipboard.dangerouslyPasteHTML(state && postDetail.contentHtml);
+    }
+  }, [quill]);
+
+  const [states, setState] = useState<States>({
+    title: state && postDetail.title,
     imgTitle: '',
     imgTitlePost: '',
   });
@@ -54,7 +53,7 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
   const [categoryId, setCategoryId] = useState<string>();
 
   const { titleErr, imgTitleErr, imgTitlePostErr, contenetHtmlErr } = showErr;
-  const { title, imgTitle, imgTitlePost } = state;
+  const { title, imgTitle, imgTitlePost } = states;
 
   useEffect(() => {
     const getCategory = async () => {
@@ -167,38 +166,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     handleChandleValidte();
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const check = handleValidate();
-    if (check) setLoading(false);
-
-    const imgTitleUrl = await handleUploadImgTitle();
-    const imgTitlePostUrl = await handleUploadImgTitlePost();
-
-    if (!check && imgTitleUrl && imgTitlePostUrl) {
-      const data = {
-        title,
-        contentHtml,
-        imgTitle: imgTitleUrl,
-        imgTitlePost: imgTitlePostUrl,
-        createdAt,
-        categoryId,
-        updatedAt: createdAt,
-      };
-
-      addDoc(usersCollectionRef, data)
-        .then((response) => {
-          if (response) {
-            console.log('response success', response);
-            setLoading(false);
-            navigate('/');
-            setState({ imgTitle: '', imgTitlePost: '', title: '' });
-          }
-        })
-        .catch((error) => console.log(error));
-    }
-  };
-
   const handleBlur = () => {
     if (title.length < 8) {
       setShowErr((pre) => ({ ...pre, titleErr: 'Vui lòng nhập ít nhát 8 kí tự' }));
@@ -222,13 +189,45 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     setCategoryId(value);
   };
 
+  const handleSubmit = async () => {
+    // setLoading(true);
+    const check = handleValidate();
+    if (check) setLoading(false);
+
+    const imgTitleUrl = await handleUploadImgTitle();
+    const imgTitlePostUrl = await handleUploadImgTitlePost();
+
+    // if (!check && imgTitleUrl && imgTitlePostUrl) {
+    //   const data = {
+    //     title,
+    //     contentHtml,
+    //     imgTitle: imgTitleUrl,
+    //     imgTitlePost: imgTitlePostUrl,
+    //     createdAt,
+    //     categoryId,
+    //     updatedAt: createdAt,
+    //   };
+
+    //   addDoc(usersCollectionRef, data)
+    //     .then((response) => {
+    //       if (response) {
+    //         console.log('response success', response);
+    //         setLoading(false);
+    //         navigate('/');
+    //         setState({ imgTitle: '', imgTitlePost: '', title: '' });
+    //       }
+    //     })
+    //     .catch((error) => console.log(error));
+    // }
+  };
+
   return (
     <PageMain>
       <div className="container">
         <div className="row">
           <div className={clsx('col-md-9', styles.root)}>
             <div className={styles.rootTitle}>
-              <h1>Tạo bài viết</h1>
+              <h1>Cập nhật</h1>
             </div>
             <div className={clsx('form-group', styles.rootContentItem)}>
               <div className="form-group mb-2">
@@ -312,7 +311,7 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
                 onClick={handleSubmit}
                 className="btn btn-outline-primary mt-3"
               >
-                {loading ? <Spinner>Loading...</Spinner> : 'Tạo bài viết'}
+                {loading ? <Spinner>Loading...</Spinner> : 'Cập nhật bài viết'}
               </button>
             </div>
           </div>

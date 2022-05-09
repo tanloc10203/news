@@ -1,4 +1,4 @@
-import { getFirestore } from '@firebase/firestore';
+import { getFirestore, serverTimestamp } from '@firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
 
@@ -19,3 +19,4 @@ const app = initializeApp(config.firebaseConfig);
 export default app;
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const createdAt = serverTimestamp();
