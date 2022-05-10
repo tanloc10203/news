@@ -20,7 +20,7 @@
   }
 
   img {
-    // width: 100%;
+    width: fit-content;
     flex-shrink: 0;
     object-fit: cover;
     transition: all 0.25s ease-in-out 0s;

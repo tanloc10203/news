@@ -34,8 +34,6 @@ export const Detail = (props: DetailProps) => {
     getCategoryDetail();
   }, [data]);
 
-  console.log(data);
-
   const toggle = () => {
     setIsOpen(false);
   };
@@ -64,7 +62,7 @@ export const Detail = (props: DetailProps) => {
                 <span className={styles.category}># {categoryName}</span>
               </div>
               <div className={styles.img}>
-                <img src={data && data.imgTitlePost} alt="" />
+                <img src={data && data.imgTitle} alt="" />
               </div>
               {authUser ? (
                 <div className={styles.flex}>

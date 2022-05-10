@@ -44,13 +44,10 @@ export function PostCreate(props: PostCreateProps) {
   const handleImgUpload = (): Promise<string | undefined> => {
     return new Promise((resolve, reject) => {
       try {
-        console.log('running handleImgUpload...');
-        console.log(imgUpload);
         if (imgUpload == null) return;
         const imageRef = ref(storage, `images/${imgUpload.name + imgUpload.lastModified}`);
         uploadBytes(imageRef, imgUpload).then((snapshot) => {
           getDownloadURL(snapshot.ref).then((url) => {
-            console.log('url success', url);
             resolve(url);
           });
         });
@@ -93,7 +90,6 @@ export function PostCreate(props: PostCreateProps) {
     const imgUrl = await handleImgUpload();
 
     if (imgUrl !== undefined) {
-      console.log('running create user...');
       addDoc(usersCollectionRef, {
         name: newName,
         age: Number(newAge),
@@ -102,7 +98,6 @@ export function PostCreate(props: PostCreateProps) {
       })
         .then((response) => {
           if (response) {
-            console.log('response success', response);
             setStatus(false);
             setNewName('');
             setNewAge(0);

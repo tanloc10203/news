@@ -1,21 +1,20 @@
 import clsx from 'clsx';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import { useQuill } from 'react-quilljs';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Spinner } from 'reactstrap';
 import { Category, PageMain } from '../../../../components/Common';
-import { db, storage } from '../../../../config';
-import styles from './UpdatePost.module.scss';
+import { createdAt, db, storage } from '../../../../config';
+import { Post } from '../../../../models';
 import { formats, modules } from '../../../../utils';
 import { showErr, States } from '../CreatePost';
-import { Spinner } from 'reactstrap';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { Post } from '../../../../models';
+import styles from './UpdatePost.module.scss';
 
 interface UpdatePostProps {}
 
 export const UpdatePost = (props: UpdatePostProps) => {
-  const usersCollectionRef = collection(db, 'post');
   const categoryCollectionRef = collection(db, 'category');
   const navigate = useNavigate();
   const { quill, quillRef } = useQuill({
@@ -26,34 +25,31 @@ export const UpdatePost = (props: UpdatePostProps) => {
 
   const { state } = useLocation();
   const postDetail: Post | any = state;
-  console.log(state);
-
-  useEffect(() => {
-    if (quill) {
-      quill.clipboard.dangerouslyPasteHTML(state && postDetail.contentHtml);
-    }
-  }, [quill]);
 
   const [states, setState] = useState<States>({
     title: state && postDetail.title,
     imgTitle: '',
-    imgTitlePost: '',
   });
   const [contentHtml, setContentHtml] = useState<string>('');
   const [imgTitleFile, setimgTitleFile] = useState<File | null>();
-  const [imgTitlePostFile, setImgTitlePostFile] = useState<File | null>();
   const [showErr, setShowErr] = useState<showErr>({
     titleErr: '',
     imgTitleErr: '',
-    imgTitlePostErr: '',
     contenetHtmlErr: '',
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [category, setCategory] = useState(Array<Category>());
-  const [categoryId, setCategoryId] = useState<string>();
+  const [categoryId, setCategoryId] = useState<string>(postDetail && postDetail.categoryId);
 
-  const { titleErr, imgTitleErr, imgTitlePostErr, contenetHtmlErr } = showErr;
-  const { title, imgTitle, imgTitlePost } = states;
+  const { titleErr, imgTitleErr, contenetHtmlErr } = showErr;
+  const { title, imgTitle } = states;
+
+  useEffect(() => {
+    if (quill) {
+      quill.clipboard.dangerouslyPasteHTML(state && postDetail.contentHtml);
+      setContentHtml(state && postDetail.contentHtml);
+    }
+  }, [quill, postDetail, state]);
 
   useEffect(() => {
     const getCategory = async () => {
@@ -92,40 +88,11 @@ export const UpdatePost = (props: UpdatePostProps) => {
     });
   };
 
-  const handleUploadImgTitlePost = (): Promise<string | undefined> => {
-    return new Promise((resolve, reject) => {
-      try {
-        if (imgTitlePostFile == null) return;
-        const imageRef = ref(
-          storage,
-          `images/${imgTitlePostFile.name + imgTitlePostFile.lastModified}`
-        );
-        uploadBytes(imageRef, imgTitlePostFile).then((snapshot) => {
-          getDownloadURL(snapshot.ref).then((url) => {
-            resolve(url);
-          });
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
   const handleValidate = (): Boolean => {
     let check = false;
 
     if (!title) {
       setShowErr((pre) => ({ ...pre, titleErr: 'Không được để trống' }));
-      check = true;
-    }
-
-    if (!imgTitle) {
-      setShowErr((pre) => ({ ...pre, imgTitleErr: 'Không được để trống' }));
-      check = true;
-    }
-
-    if (!imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: 'Không được để trống' }));
       check = true;
     }
 
@@ -141,15 +108,6 @@ export const UpdatePost = (props: UpdatePostProps) => {
     if (title) {
       setShowErr((pre) => ({ ...pre, titleErr: '' }));
     }
-
-    console.log(imgTitle);
-    if (imgTitle) {
-      setShowErr((pre) => ({ ...pre, imgTitleErr: '' }));
-    }
-
-    if (imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: '' }));
-    }
   };
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -161,7 +119,6 @@ export const UpdatePost = (props: UpdatePostProps) => {
     setState((pre) => ({ ...pre, [name]: value }));
 
     if (name === 'imgTitle') setimgTitleFile(valueFile);
-    else if (name === 'imgTitlePost') setImgTitlePostFile(valueFile);
 
     handleChandleValidte();
   };
@@ -169,14 +126,6 @@ export const UpdatePost = (props: UpdatePostProps) => {
   const handleBlur = () => {
     if (title.length < 8) {
       setShowErr((pre) => ({ ...pre, titleErr: 'Vui lòng nhập ít nhát 8 kí tự' }));
-    }
-
-    if (imgTitle) {
-      setShowErr((pre) => ({ ...pre, imgTitleErr: '' }));
-    }
-
-    if (imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: '' }));
     }
 
     if (contentHtml) {
@@ -190,35 +139,34 @@ export const UpdatePost = (props: UpdatePostProps) => {
   };
 
   const handleSubmit = async () => {
-    // setLoading(true);
-    const check = handleValidate();
-    if (check) setLoading(false);
+    if (postDetail && postDetail.id) {
+      setLoading(true);
+      const check = handleValidate();
+      const postDoc = doc(db, 'post', postDetail.id);
+      if (check) setLoading(false);
+      let data;
 
-    const imgTitleUrl = await handleUploadImgTitle();
-    const imgTitlePostUrl = await handleUploadImgTitlePost();
-
-    // if (!check && imgTitleUrl && imgTitlePostUrl) {
-    //   const data = {
-    //     title,
-    //     contentHtml,
-    //     imgTitle: imgTitleUrl,
-    //     imgTitlePost: imgTitlePostUrl,
-    //     createdAt,
-    //     categoryId,
-    //     updatedAt: createdAt,
-    //   };
-
-    //   addDoc(usersCollectionRef, data)
-    //     .then((response) => {
-    //       if (response) {
-    //         console.log('response success', response);
-    //         setLoading(false);
-    //         navigate('/');
-    //         setState({ imgTitle: '', imgTitlePost: '', title: '' });
-    //       }
-    //     })
-    //     .catch((error) => console.log(error));
-    // }
+      if (imgTitle) {
+        const imgTitleUrl = await handleUploadImgTitle();
+        data = {
+          title: title,
+          contentHtml: contentHtml,
+          imgTitle: imgTitleUrl,
+          updatedAt: createdAt,
+          categoryId: categoryId,
+        };
+      } else {
+        data = {
+          title: title,
+          contentHtml: contentHtml,
+          updatedAt: createdAt,
+          categoryId: categoryId,
+        };
+      }
+      await updateDoc(postDoc, data);
+      navigate('/');
+      setLoading(false);
+    }
   };
 
   return (
@@ -279,22 +227,6 @@ export const UpdatePost = (props: UpdatePostProps) => {
                   id="imgTitle"
                   className="form-control"
                   name="imgTitle"
-                />
-              </div>
-
-              <div className={clsx('form-group', styles.rootContentItem)}>
-                <label htmlFor="imgIntroduce" className="form-label">
-                  Ảnh giới thiệu bài viết
-                </label>
-                <p className="text-danger">{imgTitlePostErr}</p>
-                <input
-                  value={imgTitlePost}
-                  onChange={handleChangeInput}
-                  onBlur={handleBlur}
-                  type="file"
-                  id="imgIntroduce"
-                  name="imgTitlePost"
-                  className="form-control"
                 />
               </div>
 

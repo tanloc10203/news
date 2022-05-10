@@ -15,13 +15,11 @@ interface CreatePostProps {}
 export interface States {
   title: string;
   imgTitle: string;
-  imgTitlePost: string;
 }
 
 export interface showErr {
   titleErr: string;
   imgTitleErr: string;
-  imgTitlePostErr: string;
   contenetHtmlErr: string;
 }
 
@@ -38,23 +36,20 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
   const [state, setState] = useState<States>({
     title: '',
     imgTitle: '',
-    imgTitlePost: '',
   });
   const [contentHtml, setContentHtml] = useState<string>('');
   const [imgTitleFile, setimgTitleFile] = useState<File | null>();
-  const [imgTitlePostFile, setImgTitlePostFile] = useState<File | null>();
   const [showErr, setShowErr] = useState<showErr>({
     titleErr: '',
     imgTitleErr: '',
-    imgTitlePostErr: '',
     contenetHtmlErr: '',
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [category, setCategory] = useState(Array<Category>());
-  const [categoryId, setCategoryId] = useState<string>();
+  const [categoryId, setCategoryId] = useState<string>('giai-tri');
 
-  const { titleErr, imgTitleErr, imgTitlePostErr, contenetHtmlErr } = showErr;
-  const { title, imgTitle, imgTitlePost } = state;
+  const { titleErr, imgTitleErr, contenetHtmlErr } = showErr;
+  const { title, imgTitle } = state;
 
   useEffect(() => {
     const getCategory = async () => {
@@ -93,25 +88,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     });
   };
 
-  const handleUploadImgTitlePost = (): Promise<string | undefined> => {
-    return new Promise((resolve, reject) => {
-      try {
-        if (imgTitlePostFile == null) return;
-        const imageRef = ref(
-          storage,
-          `images/${imgTitlePostFile.name + imgTitlePostFile.lastModified}`
-        );
-        uploadBytes(imageRef, imgTitlePostFile).then((snapshot) => {
-          getDownloadURL(snapshot.ref).then((url) => {
-            resolve(url);
-          });
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
   const handleValidate = (): Boolean => {
     let check = false;
 
@@ -122,11 +98,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
 
     if (!imgTitle) {
       setShowErr((pre) => ({ ...pre, imgTitleErr: 'Không được để trống' }));
-      check = true;
-    }
-
-    if (!imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: 'Không được để trống' }));
       check = true;
     }
 
@@ -143,13 +114,8 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
       setShowErr((pre) => ({ ...pre, titleErr: '' }));
     }
 
-    console.log(imgTitle);
     if (imgTitle) {
       setShowErr((pre) => ({ ...pre, imgTitleErr: '' }));
-    }
-
-    if (imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: '' }));
     }
   };
 
@@ -162,7 +128,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     setState((pre) => ({ ...pre, [name]: value }));
 
     if (name === 'imgTitle') setimgTitleFile(valueFile);
-    else if (name === 'imgTitlePost') setImgTitlePostFile(valueFile);
 
     handleChandleValidte();
   };
@@ -173,14 +138,12 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
     if (check) setLoading(false);
 
     const imgTitleUrl = await handleUploadImgTitle();
-    const imgTitlePostUrl = await handleUploadImgTitlePost();
 
-    if (!check && imgTitleUrl && imgTitlePostUrl) {
+    if (!check && imgTitleUrl) {
       const data = {
         title,
         contentHtml,
         imgTitle: imgTitleUrl,
-        imgTitlePost: imgTitlePostUrl,
         createdAt,
         categoryId,
         updatedAt: createdAt,
@@ -189,10 +152,9 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
       addDoc(usersCollectionRef, data)
         .then((response) => {
           if (response) {
-            console.log('response success', response);
             setLoading(false);
             navigate('/');
-            setState({ imgTitle: '', imgTitlePost: '', title: '' });
+            setState({ imgTitle: '', title: '' });
           }
         })
         .catch((error) => console.log(error));
@@ -206,10 +168,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
 
     if (imgTitle) {
       setShowErr((pre) => ({ ...pre, imgTitleErr: '' }));
-    }
-
-    if (imgTitlePost) {
-      setShowErr((pre) => ({ ...pre, imgTitlePostErr: '' }));
     }
 
     if (contentHtml) {
@@ -280,22 +238,6 @@ export const CreatePost: React.FC = (props: CreatePostProps) => {
                   id="imgTitle"
                   className="form-control"
                   name="imgTitle"
-                />
-              </div>
-
-              <div className={clsx('form-group', styles.rootContentItem)}>
-                <label htmlFor="imgIntroduce" className="form-label">
-                  Ảnh giới thiệu bài viết
-                </label>
-                <p className="text-danger">{imgTitlePostErr}</p>
-                <input
-                  value={imgTitlePost}
-                  onChange={handleChangeInput}
-                  onBlur={handleBlur}
-                  type="file"
-                  id="imgIntroduce"
-                  name="imgTitlePost"
-                  className="form-control"
                 />
               </div>
 

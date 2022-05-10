@@ -3,7 +3,6 @@ export interface Post {
   title: string;
   contenHtml: string;
   imgTitle: string;
-  imgTitlePost: string;
   categoryId?: string;
   createdAt?: string;
   updatedAt?: string;

@@ -47,7 +47,7 @@ export function Header(props: HeaderProps) {
       }
     };
     getCategory();
-  }, [categoryCollectionRef]);
+  }, []);
 
   return (
     <div
@@ -71,15 +71,8 @@ export function Header(props: HeaderProps) {
                       <CustomLink to="/">Trang chủ</CustomLink>
                     </NavItem>
                     <NavItem>
-                      <CustomLink to="/introduce">Giới thiệu</CustomLink>
-                    </NavItem>
-                    <NavItem>
-                      <CustomLink to="/contact">Liên hệ</CustomLink>
-                    </NavItem>
-                    <NavItem>
                       <CustomLink to="/create-post">Viết bài</CustomLink>
                     </NavItem>
-
                     {localStorage.getItem('auth_user') ? (
                       <NavItem>
                         <CustomLink
@@ -97,6 +90,9 @@ export function Header(props: HeaderProps) {
                         <CustomLink to="/login">Đăng nhập</CustomLink>
                       </NavItem>
                     )}
+                    {localStorage.getItem('auth_user') ? (
+                      <NavItem>Xin chào, {authUser.displayName}!</NavItem>
+                    ) : null}
                   </Nav>
 
                   <div className={styles.headerSearch}>
@@ -129,7 +125,7 @@ export function Header(props: HeaderProps) {
                 category.map((item, i) => (
                   <Link
                     key={i}
-                    to={`/news/${item.link}-${item.id}`}
+                    to={`/news/${item.link}`}
                     style={{
                       color:
                         location &&

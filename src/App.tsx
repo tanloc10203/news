@@ -29,7 +29,7 @@ function App() {
           />
           <Route index element={<h1>News</h1>} />
           <Route path=":categoryId">
-            <Route index element={<h1>Trang con</h1>} />
+            <Route index element={<Home />} />
             <Route path=":newsId" element={<Detail />} />
           </Route>
         </Route>
